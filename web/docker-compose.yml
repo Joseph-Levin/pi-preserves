@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+  pi-preserves:
+    build: .
+    volumes:
+      - .:/code
+    ports:
+      - 8000:8000
+    command: python /code/pi_preserves_site/manage.py runserver 0.0.0.0:8000
