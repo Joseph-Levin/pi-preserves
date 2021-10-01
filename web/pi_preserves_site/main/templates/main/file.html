@@ -1,0 +1,8 @@
+{% extends "main/base.html" %}
+{% block title %}View File{% endblock %}
+
+{% block content %}
+    <h1>{{file.name}}</h1>
+    <p>Description: {{file.description}}</p>
+    <p>Author: {{file.author}}</p>
+{% endblock %}

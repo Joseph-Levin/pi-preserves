@@ -1,0 +1,11 @@
+{% extends "main/base.html" %}
+
+{% block title %}
+View Files
+{% endblock %}
+
+{% block content %}
+    {% for f in user.file.all %}
+        <p><a href="/{{f.id}}">{{f.name}}</a></p>
+    {% endfor %}
+{% endblock %}

@@ -11,7 +11,7 @@
     <style type="text/css">
 		.sidenav {
 			height:100%;
-			width:160px;
+			width:200px;
 			position: fixed;
 			z-index:1;
 			top:0;
@@ -34,7 +34,7 @@
 		}	
  
 		.content{
-			margin-left:160px;
+			margin-left:200px;
 			padding: 0px 10px;
 		}
  
@@ -45,7 +45,8 @@
     <div class="sidenav">
         <a href="/">Home</a>
         <a href="/create">Create</a>
-        <a href="/view">View</a>
+        <a href="/view_files">View My Files</a>
+		<a class="fixed-bottom" href="/login">Login</a>
     </div>
     <div class="content" id="content" name="content">
         {% block content %}
