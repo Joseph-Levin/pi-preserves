@@ -67,7 +67,7 @@ def index(request, id):
 #         "form": form,
 #     }
 #     return render(request, "main/create.html", context=context)
-def create(request):
+def upload_files(request):
     if request.method == 'POST':
         form = UploadForm(request.POST, request.FILES)
         if form.is_valid():
@@ -82,7 +82,7 @@ def create(request):
     else:
         form = UploadForm()
 
-    return render(request, 'main/create.html', {'form':form})
+    return render(request, 'main/upload.html', {'form':form})
 
 
 def view_files(request):

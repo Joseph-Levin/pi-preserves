@@ -6,7 +6,7 @@ Upload New File
 {% block content %}
     <h3> Upload a new file</h3>
     <br>
-    <form method="post" action="/create/" enctype='multipart/form-data' class="form-group">
+    <form method="post" action="/upload/" enctype='multipart/form-data' class="form-group">
         {% csrf_token %}
         <div class="input-group mb-3">
             {{form.as_p}}

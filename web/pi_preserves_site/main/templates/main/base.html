@@ -11,7 +11,7 @@
     <style type="text/css">
 		.sidenav {
 			height:100%;
-			width:200px;
+			width:20%;
 			position: fixed;
 			z-index:1;
 			top:0;
@@ -24,7 +24,7 @@
 		.sidenav a {
 			padding:6px 8px 6px 16px;
 			text-decoration: none;
-			font-size:25px;
+			font-size:80%;
 			color: #818181;
 			display:block;
 		}
@@ -32,6 +32,14 @@
 		.sidenav a:hover{
 			color:#f1f1f1;
 		}	
+		
+		.sidenav p {
+			padding:6px 8px 6px 16px;
+			text-decoration: none;
+			font-size: 1vmin;
+			color: #818181;
+			display:block;
+		}
  
 		.content{
 			margin-left:200px;
@@ -44,9 +52,17 @@
 <body>
     <div class="sidenav">
         <a href="/">Home</a>
-        <a href="/create">Create</a>
+        <a href="/upload">Upload</a>
         <a href="/view_files">View My Files</a>
-		<a class="fixed-bottom" href="/login">Login</a>
+		<div class="fixed-bottom">
+			{% if user.is_authenticated %}
+				<p>Welcome {{ user.username }}</p>
+				<a href="/logout">Logout</a>
+			{% else %}
+				<a href="/login">Login</a>
+				<a href="/register">Sign Up</a>
+			{% endif %}
+		</div>
     </div>
     <div class="content" id="content" name="content">
         {% block content %}
