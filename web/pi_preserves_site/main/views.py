@@ -10,7 +10,7 @@ from .forms import RegistrationForm, UploadForm#, CreateNewFile
 def home(request):
     context = {
         "title": "Pi Preserves",
-        "body": "Poodog",
+        "body": "Pi Preserves is a work in progress",
     }
 
     return render(request, "main/home.html", context=context)
@@ -87,3 +87,6 @@ def upload_files(request):
 
 def view_files(request):
     return render(request, "main/view_files.html", {})
+
+
+# def download_file(request):
