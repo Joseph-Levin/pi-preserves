@@ -51,7 +51,7 @@ int main()
     printf("Server socket created.\n");
 
     server_addr.sin_family = AF_INET;
-    server_addr.sin_port = port;
+    server_addr.sin_port = htons(port);
     server_addr.sin_addr.s_addr = inet_addr(ip);
 
     e = bind(sockfd, (struct sockaddr *)&server_addr, sizeof(server_addr));
