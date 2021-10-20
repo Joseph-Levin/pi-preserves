@@ -133,3 +133,7 @@ LOGOUT_REDIRECT_URL = '/'
 
 MEDIA_ROOT = Path.joinpath(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
+FILE_UPLOAD_TEMP_DIR = Path.joinpath(BASE_DIR, 'tempuploads')
+
+FILE_SERVER_PORT = 8888
+FILE_SERVER_ADDRESS = '127.0.0.1'

@@ -2,9 +2,12 @@ from django.http.response import HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.contrib.auth import logout
 from django.http import HttpResponse
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 
 from .models import File
 from .forms import RegistrationForm, UploadForm#, CreateNewFile
+from .fileupload import FileUploadToServer
 
 
 def home(request):
@@ -47,27 +50,9 @@ def index(request, id):
     return render(request, "main/file.html", {})
 
 
-# def create(request):
-#     if request.method == "POST":
-#         form = CreateNewFile(request.POST)
-
-#         if form.is_valid():
-#             n = form.cleaned_data["name"]
-#             s = form.cleaned_data["size"]
-#             f = File(name=n, size=s)
-#             f.save()
-#             request.user.file.add(f)
-
-#         return HttpResponseRedirect("/%i" %f.id)
-
-#     else:
-#         form = CreateNewFile()
-
-#     context = {
-#         "form": form,
-#     }
-#     return render(request, "main/create.html", context=context)
+@method_decorator(csrf_exempt, 'dispatch')
 def upload_files(request):
+    request.upload_handlers.insert(0, FileUploadToServer())
     if request.method == 'POST':
         form = UploadForm(request.POST, request.FILES)
         if form.is_valid():
