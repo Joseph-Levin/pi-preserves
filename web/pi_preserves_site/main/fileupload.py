@@ -31,6 +31,10 @@ class FileUploadToServer(TemporaryFileUploadHandler):
   def new_file(self, *args, **kwargs):
     super().new_file(*args, **kwargs)
     self.file = TemporaryUploadedFile(self.file_name, self.content_type, 0, self.charset, self.content_type_extra)
+    print("Content Type", self.content_type)
+    print("Charset", self.charset)
+    print("Extra content", self.content_type_extra)
+    print("Content length", self.content_length)
 
   def receive_data_chunk(self, raw_data, start):
       self.file.write(raw_data)
@@ -55,5 +59,7 @@ class FileUploadToServer(TemporaryFileUploadHandler):
     
     sock.close()
 
+    print("Content length", self.content_length)
     self.file.seek(0)
+    #self.file.close()
     return self.file

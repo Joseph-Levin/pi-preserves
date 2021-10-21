@@ -39,7 +39,7 @@ void write_file(int sockfd) {
     n = recv(sockfd, filename, SIZE, 0);
     printf("Received filename: %s\n", filename);
 
-    fp = fopen(filename, "w");
+    fp = fopen(filename, "wb");
     if (fp == NULL) {
         perror("Error in creating file");
         send(sockfd, FAILURE, 14, 0);
@@ -54,7 +54,8 @@ void write_file(int sockfd) {
         if (n <= 0) {
             break;
         }
-        fprintf(fp, "%s", buffer);
+        // fprintf(fp, "%s", buffer);
+        fwrite(buffer, 1, n, fp);
     }
     fclose(fp);
     return;
