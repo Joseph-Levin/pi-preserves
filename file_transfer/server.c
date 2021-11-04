@@ -137,7 +137,7 @@ int main()
                 continue;
             }
 
-            printf("Accepted connection from %s\n", inet_ntoa(new_addr.sin_addr));
+            printf("Accepted connection from %s:%hu\n", inet_ntoa(new_addr.sin_addr), new_addr.sin_port);
 
             // Receive type of request from connection
             char request[16];

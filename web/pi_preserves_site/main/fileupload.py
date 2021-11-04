@@ -7,8 +7,8 @@ from django.conf import settings
 
 BUFFER_SIZE = 2048
 ACK = b"ACK\x00"
-ACK_SIZE = 16
-FAILURE = b"/--FAILURE--/\x00"
+ACK_SIZE = 4
+FAILURE = b"FAL\x00"
 
 def send_ack(s):
   s.send("ACK".encode())
@@ -17,13 +17,13 @@ def send_ack(s):
 def recv_ack(s):
   ack = s.recv(ACK_SIZE)
   if ack == ACK:
-    return
+    return True
   elif ack == FAILURE:
     print("Failure detected")
-    exit()
+    return False
   else:
     print("ACK not received. Received", ack)
-    exit()
+    return False
 
 class FileUploadToServer(TemporaryFileUploadHandler):
   
@@ -40,6 +40,7 @@ class FileUploadToServer(TemporaryFileUploadHandler):
       self.file.write(raw_data)
       return None
 
+# TODO error checking for recv_ack
   def file_complete(self, file_size):
     sock = socket(AF_INET, SOCK_STREAM)
     sock.connect((settings.FILE_SERVER_ADDRESS, settings.FILE_SERVER_PORT))
@@ -59,7 +60,5 @@ class FileUploadToServer(TemporaryFileUploadHandler):
     
     sock.close()
 
-    print("Content length", self.content_length)
     self.file.seek(0)
-    #self.file.close()
     return self.file

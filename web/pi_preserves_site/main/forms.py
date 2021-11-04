@@ -21,6 +21,12 @@ class UploadForm(forms.ModelForm):
     model = models.File
     fields = ('description', 'file',)
 
+  def save(self, commit=True):
+      upload = super(UploadForm, self).save(commit=False)
+      if commit:
+          upload.save()
+      return upload
+
 # class UploadForm(forms.Form):
 #   title = forms.CharField(max_length=255)
 #   file_field = forms.FileField()
