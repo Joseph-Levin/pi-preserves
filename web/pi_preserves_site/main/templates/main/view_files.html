@@ -6,6 +6,9 @@ View Files
 
 {% block content %}
     {% for f in user.file.all %}
-        <p><a href="{{f.file.url}}" download>{{f.description}}</a></p>
+        <p>
+            <a href="/download/{{f.id}}" download>{{f.file.name}} - {{f.description}}</a>
+            <a class="btn btn-danger" href="/delete/{{f.id}}">Delete</a>
+        </p>
     {% endfor %}
 {% endblock %}

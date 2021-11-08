@@ -4,10 +4,13 @@ from django.contrib.auth import logout
 from django.http import HttpResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
+from socket import socket, AF_INET, SOCK_STREAM
+from django.conf import settings
 
 from .models import File
 from .forms import RegistrationForm, UploadForm#, CreateNewFile
-from .fileupload import FileUploadToServer
+from .fileupload import FileUploadToServer, recv_ack, send_ack, BUFFER_SIZE
+from .exceptions import FileServerError
 
 
 def home(request):
@@ -42,17 +45,36 @@ def logout_view(request):
     return redirect('/login/')
 
 
-def index(request, id):
-    f = File.objects.get(id=id)
-    if f in request.user.file.all():
-        return render(request, "main/file.html", {"file":f})
+def download_file_request(request, id):
+    sock = socket(AF_INET, SOCK_STREAM)
+    sock.connect((settings.FILE_SERVER_ADDRESS, settings.FILE_SERVER_PORT))
+    sock.send("download".encode())
+    recv_ack(sock)
+
+
+    filename = File.objects.get(id=id).file.name
+    print(filename)
+    sock.send(filename.encode())
+    recv_ack(sock)
+
+    file = bytearray()
+    data = sock.recv(BUFFER_SIZE)
+    send_ack(sock)
+    while data:
+        file += data
+        data = sock.recv(BUFFER_SIZE)
+        send_ack(sock)
+    sock.close()
     
-    return render(request, "main/file.html", {})
+    response = HttpResponse(bytes(file))
+    response['Content-Disposition'] = 'inline; filename=' + filename
+    return response
+
 
 
 @method_decorator(csrf_exempt, 'dispatch')
 def upload_files(request):
-    request.upload_handlers.insert(0, FileUploadToServer())
+    #request.upload_handlers.insert(0, FileUploadToServer())
     if request.method == 'POST':
         form = UploadForm(request.POST, request.FILES)
         if form.is_valid():
@@ -62,7 +84,7 @@ def upload_files(request):
             # form.save()
             # request.user.file.add(form.File)
 
-        return HttpResponseRedirect('/%i' %file.id)
+        return HttpResponseRedirect('/')
 
     else:
         form = UploadForm()
@@ -70,8 +92,26 @@ def upload_files(request):
     return render(request, 'main/upload.html', {'form':form})
 
 
-def view_files(request):
+def delete_file(request, id):
+    sock = socket(AF_INET, SOCK_STREAM)
+    sock.connect((settings.FILE_SERVER_ADDRESS, settings.FILE_SERVER_PORT)) 
+    sock.send("delete".encode())
+    if recv_ack(sock) == False:
+        raise FileServerError("Server did not successfully respond")
+    
+    file = File.objects.get(id=id)
+    sock.send(file.file.name.encode())
+
+    if recv_ack(sock) == False:
+        raise FileServerError("Server did not successfully respond")
+
+    if recv_ack(sock) == False:
+        raise FileServerError("File not deleted successfully")
+    
+    file.delete()
+
     return render(request, "main/view_files.html", {})
 
 
-# def download_file(request):
+def view_files(request):
+    return render(request, "main/view_files.html", {})

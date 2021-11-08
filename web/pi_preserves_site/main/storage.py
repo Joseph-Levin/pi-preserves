@@ -1,10 +1,12 @@
 import os
 import socket
 import pathlib
+from urllib.parse import urljoin
 from datetime import datetime
 from django.core.files.base import ContentFile
 from django.core.files.storage import Storage
 from django.utils._os import safe_join
+from django.utils.encoding import filepath_to_uri
 from django.utils.functional import cached_property
 from django.conf import settings
 from .fileupload import recv_ack, send_ack, BUFFER_SIZE
@@ -117,3 +119,11 @@ class PiStorage(Storage):
   #TODO make new server action to check if file exists
   def exists(self, name):
     return False
+
+  def url(self, name):
+    if self.base_url is None:
+      raise ValueError("This file is not accessible via a URL")
+    url = filepath_to_uri(name)
+    if url is not None:
+      url = url.lstrip('/')
+    return urljoin(self.base_url, url)

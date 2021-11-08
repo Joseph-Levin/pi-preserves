@@ -53,3 +53,8 @@ dkms.conf
 
 # Hidden files
 .*
+
+# Other files
+*.sqlite3
+*__pycache__/
+*migrations/
