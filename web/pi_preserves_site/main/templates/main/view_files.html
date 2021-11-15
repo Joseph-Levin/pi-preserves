@@ -1,4 +1,5 @@
 {% extends "main/base.html" %}
+{% load template_filter %}
 
 {% block title %}
 View Files
@@ -7,7 +8,7 @@ View Files
 {% block content %}
     {% for f in user.file.all %}
         <p>
-            <a href="/download/{{f.id}}" download>{{f.file.name}} - {{f.description}}</a>
+            <a href="/download/{{f.id}}" download>{{ f.file.name|filenamesplit }} - {{f.description}}</a>
             <a class="btn btn-danger" href="/delete/{{f.id}}">Delete</a>
         </p>
     {% endfor %}

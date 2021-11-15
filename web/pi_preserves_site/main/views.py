@@ -67,7 +67,7 @@ def download_file_request(request, id):
     sock.close()
     
     response = HttpResponse(bytes(file))
-    response['Content-Disposition'] = 'inline; filename=' + filename
+    response['Content-Disposition'] = 'inline; filename=' + filename.split('/')[-1]
     return response
 
 

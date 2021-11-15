@@ -89,6 +89,8 @@ class PiStorage(Storage):
     s.send("upload".encode())
     if recv_ack(s) == False:
       raise FileServerError("Server did not successfully respond")
+
+    print(name)
     s.send(name.encode())
     if recv_ack(s) == False:
       raise FileServerError("Server did not successfully respond")
