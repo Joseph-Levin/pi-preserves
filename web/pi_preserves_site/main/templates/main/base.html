@@ -3,72 +3,63 @@
 <html class="no-js" lang="en">
 
 <head>
-    <meta charset="utf-8" />
-    <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Pi Preserves{% endblock %}</title>
-    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
-    <style type="text/css">
-		.sidenav {
-			height:100%;
-			width:15%;
-			position: fixed;
-			z-index:1;
-			top:0;
-			left:0;
-			background-color:#111;
-			overflow-x: hidden;
-			padding-top: 20px;
-		}
- 
-		.sidenav a {
-			padding:6px 8px 6px 16px;
-			text-decoration: none;
-			font-size:2vmin;
-			color: #818181;
-			display:block;
-		}
- 
-		.sidenav a:hover{
-			color:#f1f1f1;
-		}	
-		
-		.sidenav p {
-			padding:6px 8px 6px 16px;
-			text-decoration: none;
-			font-size: 2vmin;
-			color: #818181;
-			display:block;
-		}
- 
-		.content{
-			margin-left:15%;
-			padding: 10px 15px;
-		}
- 
-	</style>
+  <meta charset="utf-8" />
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/foundation-sites@6.7.4/dist/css/foundation.min.css"
+    crossorigin="anonymous">
+  <link rel="stylesheet" href="{% static 'css/base.css' %}">
+
+  <title>{% block title %}Pi Preserves{% endblock %}</title>
 </head>
 
 <body>
-    <div class="sidenav">
-        <a href="/">Home</a>
-        <a href="/upload">Upload</a>
-        <a href="/view_files">View My Files</a>
-		<div class="fixed-bottom">
-			{% if user.is_authenticated %}
-				<p>Welcome {{ user.username }}</p>
-				<a href="/logout">Logout</a>
-			{% else %}
-				<a href="/login">Login</a>
-				<a href="/register">Sign Up</a>
-			{% endif %}
-		</div>
+  <div data-sticky-container>
+    <div data-sticky data-margin-top='0'>
+
+      <div class="top-bar topbar-responsive">
+        <div class="top-bar-title">
+          <span data-responsive-toggle="topbar-responsive" data-hide-for="medium">
+            <button class="menu-icon" type="button" data-toggle></button>
+          </span>
+          <a class="topbar-responsive-logo" href="/"><strong>Pi Preserves</strong></a>
+        </div>
+        <div id="topbar-responsive" class="topbar-responsive-links">
+          <div class="top-bar-right">
+            <ul class="menu simple vertical medium-horizontal">
+              <li><a href="/">Home</a></li>
+              {% if request.user.is_authenticated %}
+              <li><a href="/upload">Upload Files</a></li>
+              <li><a href="/create_folder">Create Folder</a></li>
+              <li><a href="/view_files">View Files</a></li>
+              <li><a href="/logout" class="topbar-responsive-button">Logout</a></li>
+              {% else %}
+              <li><a href="/login" class="topbar-responsive-button">Login</a></li>
+              {% endif %}
+            </ul>
+          </div>
+        </div>
+      </div>
+
     </div>
-    <div class="content" id="content" name="content">
-        {% block content %}
-        {% endblock %}
-    </div>
-    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+
+  </div>
+
+  <div class="content" id="content" name="content">
+    {% block content %}
+    {% endblock %}
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+    integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/foundation-sites@6.7.4/dist/js/foundation.min.js"
+    crossorigin="anonymous"></script>
+  <script>
+    $(document).foundation();
+  </script>
+
+  {% block scripts %}
+  {% endblock %}
 </body>
 
 </html>

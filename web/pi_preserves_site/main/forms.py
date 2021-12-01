@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User as auth_user
+from django.forms import widgets
 
 from . import models
 
@@ -12,40 +13,20 @@ def must_be_unique(value):
   return value
 
 
-# class CreateNewFile(forms.Form):
-#     name = forms.CharField(label="File Name", max_length=255)
-#     size = forms.IntegerField(label="File Size")
-
-class UploadForm(forms.ModelForm):
-  class Meta:
-    model = models.File
-    fields = ('description', 'file',)
-
-  def save(self, commit=True):
-      upload = super(UploadForm, self).save(commit=False)
-      if commit:
-          upload.save()
-      return upload
-
-# class UploadForm(forms.Form):
-#   title = forms.CharField(max_length=255)
-#   file_field = forms.FileField()
-    
-
 class RegistrationForm(UserCreationForm):
     email = forms.EmailField(
         label="Email",
         required=True,
         validators=[must_be_unique]
-        )
+    )
 
     class Meta:
         model = auth_user
         fields = (
-          "username",
-          "email",
-          "password1",
-          "password2",
+            "username",
+            "email",
+            "password1",
+            "password2",
         )
 
     def save(self, commit=True):
@@ -54,3 +35,38 @@ class RegistrationForm(UserCreationForm):
         if commit:
             user.save()
         return user
+
+
+class FolderForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+      self.userid = kwargs.pop('userid', None)
+      kwargs.update(initial={'owner': self.userid})
+      super(FolderForm, self).__init__(*args, **kwargs)
+      self.fields['parent_folder'].queryset = models.Folder.objects.filter(owner=self.userid)
+
+    class Meta:
+      model = models.Folder
+      fields = '__all__'
+      widgets = {
+        'owner': forms.HiddenInput(),
+        'files': forms.HiddenInput(),
+        'sub_folders': forms.HiddenInput(),
+      }
+
+
+class FileForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+      # instance = kwargs.get('instance', None)
+      self.userid = kwargs.pop('userid', None)
+      kwargs.update(initial={'author': self.userid})
+      super(FileForm, self).__init__(*args, **kwargs)
+      self.fields['shared_to'].queryset = auth_user.objects.exclude(pk=self.userid)#.exclude(shared_files__id=)
+      self.fields['parent_folder'].queryset = models.Folder.objects.filter(owner=self.userid)
+
+    class Meta:
+      model = models.File
+      fields = ('description', 'file', 'author', 'shared_to', 'public', 'parent_folder')
+      widgets = {
+        'author': forms.HiddenInput(),
+      }
+

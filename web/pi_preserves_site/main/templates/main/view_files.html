@@ -6,10 +6,32 @@ View Files
 {% endblock %}
 
 {% block content %}
-    {% for f in user.file.all %}
-        <p>
-            <a href="/download/{{f.id}}" download>{{ f.file.name|filenamesplit }} - {{f.description}}</a>
-            <a class="btn btn-danger" href="/delete/{{f.id}}">Delete</a>
-        </p>
-    {% endfor %}
-{% endblock %}
+<div class="grid-x grid-padding-x">
+    <div class="cell large-12 medium-12 small-12">
+        <div class="cell auto"></div>
+        <div class="cell large-8 medium-8 small-12">
+            <h1 class="text-center">View Files</h1>
+        </div>
+        <div class="cell auto"></div>
+    </div>
+
+    <div class="cell large-2 medium-2"></div>
+    <div class="cell large-8 medium-8 small-12">
+
+        {% for f in user.file.all %}
+        <div class="card household_card">
+            <div class="card-divider">
+                <a href="/view/{{ f.id }}">{{ f.file.name|filenamesplit }} - {{f.description}}</a>
+            </div>
+            <div class="card-section">
+                <a class="button expanded" href="/delete/{{f.id}}">Delete</a>
+                <!-- {% if house.icon %}
+                <img src="{{ house.icon.url }}" />
+                {% else %}
+                <img src="{{ default_icon }}" />
+                {% endif %} -->
+            </div>
+        </div>
+        {% endfor %}
+        <div class="cell large-2 medium-2"></div>
+        {% endblock %}

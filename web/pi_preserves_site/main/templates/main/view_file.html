@@ -1,0 +1,21 @@
+{% extends "main/base.html" %}
+{% load template_filter %}
+
+{% block content %}
+
+<div class="grid-x">
+    <div class="cell large-12 medium-12 small-12">
+        <h1 class="text-center">{{ file.file.name|filenamesplit }}</h1>
+    </div>
+    <div class="cell large-4 medium-4 small-5">
+        <a class="button expanded" href="#" onClick="javascript:history.go(-1);">Back</a>
+    </div>
+    <div class="cell large-4 medium-4 small-2">
+    </div>
+    <div class="cell large-4 medium-4 small-5">
+        <a class="button expanded" href="/download/{{ file.id }}" download>Download</a>
+    </div>
+</div>
+
+
+{% endblock %}

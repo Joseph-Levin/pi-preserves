@@ -157,7 +157,7 @@ void delete_file(int sockfd) {
 
 int main()
 {
-    char *ip = "127.0.0.1";
+    char *ip = "file-server";
     int port = 8888;
     int e;
 
