@@ -5,7 +5,7 @@
 
 <div class="grid-x">
     <div class="cell large-12 medium-12 small-12">
-        <h1 class="text-center">{{ file.file.name|filenamesplit }}</h1>
+        <h1 class="text-center">{{ fobj.file.name|filenamesplit }}</h1>
     </div>
     <div class="cell large-4 medium-4 small-5">
         <a class="button expanded" href="#" onClick="javascript:history.go(-1);">Back</a>
@@ -13,8 +13,19 @@
     <div class="cell large-4 medium-4 small-2">
     </div>
     <div class="cell large-4 medium-4 small-5">
-        <a class="button expanded" href="/download/{{ file.id }}" download>Download</a>
+        <a class="button expanded" href="/download/{{ fobj.id }}" download>Download</a>
     </div>
+</div>
+
+<div class="grid-x">
+    <div class="cell large-2 medium-2"></div>
+    <div class="cell large-8 medium-8">
+        <img src="{{ preview_path }}">
+    </div>
+    <div class="cell large-2 medium-2">
+    </div>
+    <!-- <iframe src="{{ preview_path }}" > -->
+
 </div>
 
 

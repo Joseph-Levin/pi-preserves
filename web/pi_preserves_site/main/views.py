@@ -8,11 +8,20 @@ from django.views.decorators.csrf import csrf_exempt
 from socket import socket, AF_INET, SOCK_STREAM
 from django.conf import settings
 
+from pathlib import Path
+from string import ascii_uppercase, digits
+from random import choice
+from datetime import date, datetime
+
 from .models import File, Folder
 from .forms import RegistrationForm, FileForm, FolderForm#, CreateNewFile
 from .fileupload import FileUploadToServer, recv_ack, send_ack, BUFFER_SIZE
 from .exceptions import FileServerError
 
+def temp_name_generator(size=4, chars=ascii_uppercase + digits):
+    now = datetime.now().strftime('%m-%d-') 
+
+    return now + ''.join(choice(chars) for _ in range(size))
 
 def home(request):
     context = {
@@ -136,12 +145,46 @@ def create_folder(request):
 
 
 def view_file(request, id):
-    file = File.objects.get(id=id)
-    shared_to = file.shared_to
-    print(shared_to)
+    Fobj = File.objects.get(id=id)
+    shared_to = Fobj.shared_to
+    extension = Fobj.file.name.rsplit('.')[-1].lower()
+    image_ext = ['apng', 'avif', 'gif', 'jpg', 'jpeg', 'jfif', 'pjpeg', 'pgp', 'png', 'svg', 'webp']
+
+    print(extension)
+
+    sock = socket(AF_INET, SOCK_STREAM)
+    sock.connect((settings.FILE_SERVER_ADDRESS, settings.FILE_SERVER_PORT))
+    sock.send("download".encode())
+    recv_ack(sock)
+
+
+    filename = File.objects.get(id=id).file.name
+    print(filename)
+    sock.send(filename.encode())
+    recv_ack(sock)
+
+    file = bytearray()
+    data = sock.recv(BUFFER_SIZE)
+    send_ack(sock)
+    while data:
+        file += data
+        data = sock.recv(BUFFER_SIZE)
+        send_ack(sock)
+    sock.close()
+
+    temp_name = temp_name_generator() + '.' + extension
+    f = open(Path.joinpath(settings.MEDIA_ROOT, 'temp', temp_name), mode='wb')
+    f.write(file)
+    f.close()
+    
+    preview_path = settings.MEDIA_URL + 'temp/' + temp_name
+
+    print('preview name:', preview_path)
+
 
     context = {
-        'file': file,
+        'fobj': Fobj,
+        'preview_path': preview_path,
     }
 
     return render(request, 'main/view_file.html', context=context)
