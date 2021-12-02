@@ -149,8 +149,8 @@ def view_file(request, id):
     shared_to = Fobj.shared_to
     extension = Fobj.file.name.rsplit('.')[-1].lower()
     image_ext = ['apng', 'avif', 'gif', 'jpg', 'jpeg', 'jfif', 'pjpeg', 'pgp', 'png', 'svg', 'webp']
+    date_published = Fobj.uploaded_at.strftime('%B %-d, %Y')
 
-    print(extension)
 
     sock = socket(AF_INET, SOCK_STREAM)
     sock.connect((settings.FILE_SERVER_ADDRESS, settings.FILE_SERVER_PORT))
@@ -179,12 +179,13 @@ def view_file(request, id):
     
     preview_path = settings.MEDIA_URL + 'temp/' + temp_name
 
-    print('preview name:', preview_path)
-
 
     context = {
         'fobj': Fobj,
         'preview_path': preview_path,
+        'file_ext': extension,
+        'image_extensions': image_ext,
+        'date': date_published,
     }
 
     return render(request, 'main/view_file.html', context=context)

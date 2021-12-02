@@ -19,11 +19,30 @@
 
 <div class="grid-x">
     <div class="cell large-2 medium-2"></div>
+    <div class="cell large-8 medium-8 text-center">
+        <img src="{{ preview_path }}" style="height: 50vh;">
+    </div>
+    <div class="cell large-2 medium-2"></div>
+
+    <div class="cell large-2 medium-2"></div>
     <div class="cell large-8 medium-8">
-        <img src="{{ preview_path }}">
+        <div class="cell large-12 medium-12 small-12">
+            <h5>Description:</h5>
+        </div>
+        <div class="cell large-12 medium-12 small-12">
+            {{ fobj.description }}
+        </div>
     </div>
-    <div class="cell large-2 medium-2">
+    <div class="cell large-2 medium-2"></div>
+
+    <div class="cell large-2 medium-2"></div>
+    <div class="cell large-4 medium-4 small-4">
+        Author: {{ fobj.author.username }}
     </div>
+    <div class="cell large-4 medium-4 small-4">
+        Uploaded On: {{ date }}
+    </div>
+    <div class="cell large-2 medium-2"></div>
     <!-- <iframe src="{{ preview_path }}" > -->
 
 </div>
