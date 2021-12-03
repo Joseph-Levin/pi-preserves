@@ -34,6 +34,8 @@ class File(models.Model):
     shared_to = models.ManyToManyField(User, blank=True, related_name='shared_files')
     public = models.BooleanField(default=False)
     parent_folder = models.ForeignKey('Folder', on_delete=models.CASCADE, related_name='file')
+    size = models.IntegerField()
+    hash = models.CharField(blank=True, max_length=32)
 
 
 class Folder(models.Model):

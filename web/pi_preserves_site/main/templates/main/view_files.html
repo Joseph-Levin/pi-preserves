@@ -24,12 +24,8 @@ View Files
                 <a href="/view/{{ f.id }}">{{ f.file.name|filenamesplit }} - {{f.description}}</a>
             </div>
             <div class="card-section">
+                <a class="button expanded" href="/download/{{f.id}}" download>Download</a>
                 <a class="button expanded" href="/delete/{{f.id}}">Delete</a>
-                <!-- {% if house.icon %}
-                <img src="{{ house.icon.url }}" />
-                {% else %}
-                <img src="{{ default_icon }}" />
-                {% endif %} -->
             </div>
         </div>
         {% endfor %}

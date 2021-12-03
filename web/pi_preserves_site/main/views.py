@@ -12,6 +12,8 @@ from pathlib import Path
 from string import ascii_uppercase, digits
 from random import choice
 from datetime import date, datetime
+from hashlib import md5
+from os.path import exists
 
 from .models import File, Folder
 from .forms import RegistrationForm, FileForm, FolderForm#, CreateNewFile
@@ -58,27 +60,34 @@ def logout_view(request):
 
 
 def download_file_request(request, id):
-    sock = socket(AF_INET, SOCK_STREAM)
-    sock.connect((settings.FILE_SERVER_ADDRESS, settings.FILE_SERVER_PORT))
-    sock.send("download".encode())
-    recv_ack(sock)
+    file_obj = File.objects.get(id=id)
+    filename = file_obj.file.name
 
+    extension = file_obj.file.name.rsplit('.')[-1].lower()
+    cached_path = Path.joinpath(settings.MEDIA_ROOT, 'temp', file_obj.hash + '.' + extension)
+    
+    if not exists(cached_path):
+        sock = socket(AF_INET, SOCK_STREAM)
+        sock.connect((settings.FILE_SERVER_ADDRESS, settings.FILE_SERVER_PORT))
+        sock.send("download".encode())
+        recv_ack(sock)
 
-    filename = File.objects.get(id=id).file.name
-    print(filename)
-    sock.send(filename.encode())
-    recv_ack(sock)
+        sock.send(filename.encode())
+        recv_ack(sock)
 
-    file = bytearray()
-    data = sock.recv(BUFFER_SIZE)
-    send_ack(sock)
-    while data:
-        file += data
+        file = bytearray()
         data = sock.recv(BUFFER_SIZE)
         send_ack(sock)
-    sock.close()
+        while data:
+            file += data
+            data = sock.recv(BUFFER_SIZE)
+            send_ack(sock)
+        sock.close()
+        response = HttpResponse(bytes(file))
+
+    else:
+        response = HttpResponse(open(cached_path, mode='rb').read())
     
-    response = HttpResponse(bytes(file))
     response['Content-Disposition'] = 'inline; filename=' + filename.split('/')[-1]
     return response
 
@@ -148,44 +157,59 @@ def view_file(request, id):
     Fobj = File.objects.get(id=id)
     shared_to = Fobj.shared_to
     extension = Fobj.file.name.rsplit('.')[-1].lower()
-    image_ext = ['apng', 'avif', 'gif', 'jpg', 'jpeg', 'jfif', 'pjpeg', 'pgp', 'png', 'svg', 'webp']
+    file_ext = {
+        'image': ['apng', 'avif', 'gif', 'jpg', 'jpeg', 'jfif', 'pjpeg', 'pgp', 'png', 'svg', 'webp'],
+        'audio': ['mp3', 'mpeg', 'wav'],
+        'video': ['mp4', 'ogg', 'webm'],
+        'pdf': ['pdf'],
+    }
+
     date_published = Fobj.uploaded_at.strftime('%B %-d, %Y')
+    temp_path = Path.joinpath(settings.MEDIA_ROOT, 'temp', Fobj.hash + '.' + extension)
+
+    if not Fobj.hash or not exists(temp_path):
+        new_hash = md5()
+        sock = socket(AF_INET, SOCK_STREAM)
+        sock.connect((settings.FILE_SERVER_ADDRESS, settings.FILE_SERVER_PORT))
+        sock.send("download".encode())
+        recv_ack(sock)
 
 
-    sock = socket(AF_INET, SOCK_STREAM)
-    sock.connect((settings.FILE_SERVER_ADDRESS, settings.FILE_SERVER_PORT))
-    sock.send("download".encode())
-    recv_ack(sock)
+        filename = File.objects.get(id=id).file.name
+        sock.send(filename.encode())
+        recv_ack(sock)
 
-
-    filename = File.objects.get(id=id).file.name
-    print(filename)
-    sock.send(filename.encode())
-    recv_ack(sock)
-
-    file = bytearray()
-    data = sock.recv(BUFFER_SIZE)
-    send_ack(sock)
-    while data:
-        file += data
+        file = bytearray()
         data = sock.recv(BUFFER_SIZE)
         send_ack(sock)
-    sock.close()
+        while data:
+            new_hash.update(data)
+            file += data
+            data = sock.recv(BUFFER_SIZE)
+            send_ack(sock)
+        sock.close()
 
-    temp_name = temp_name_generator() + '.' + extension
-    f = open(Path.joinpath(settings.MEDIA_ROOT, 'temp', temp_name), mode='wb')
-    f.write(file)
-    f.close()
+        Fobj.hash = new_hash.hexdigest()
+        Fobj.save()
+        temp_name = new_hash.hexdigest() + '.' + extension
+        f = open(Path.joinpath(settings.MEDIA_ROOT, 'temp', temp_name), mode='wb')
+        f.write(file)
+        f.close()
+        
+        preview_path = settings.MEDIA_URL + 'temp/' + temp_name
+
+    else:
+        preview_path = settings.MEDIA_URL + 'temp/' + Fobj.hash + '.' + extension
     
-    preview_path = settings.MEDIA_URL + 'temp/' + temp_name
-
+    default_icon = settings.MEDIA_URL + 'default_file.png'
 
     context = {
         'fobj': Fobj,
         'preview_path': preview_path,
         'file_ext': extension,
-        'image_extensions': image_ext,
+        'file_extensions': file_ext,
         'date': date_published,
+        'default_icon': default_icon,
     }
 
     return render(request, 'main/view_file.html', context=context)

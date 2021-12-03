@@ -70,3 +70,9 @@ class FileForm(forms.ModelForm):
         'author': forms.HiddenInput(),
       }
 
+    def save(self, commit=True):
+        file = super(FileForm, self).save(commit=False)
+        file.size = file.file.size
+        if commit:
+            file.save()
+        return file

@@ -20,7 +20,17 @@
 <div class="grid-x">
     <div class="cell large-2 medium-2"></div>
     <div class="cell large-8 medium-8 text-center">
+        {% if file_ext in file_extensions.image %}
         <img src="{{ preview_path }}" style="height: 50vh;">
+        {% elif file_ext in file_extensions.audio %}
+        <audio controls src="{{ preview_path }}"></audio>
+        {% elif file_ext in file_extensions.video %}
+        <video controls src="{{ preview_path }}"></video>
+        {% elif file_ext in file_extensions.pdf %}
+        <div id="pdf" style="height: 80vh;"></div>
+        {% else %}
+        <img src="{{ default_icon }}" style="height: 15vh;">
+        {% endif %}
     </div>
     <div class="cell large-2 medium-2"></div>
 
@@ -42,10 +52,18 @@
     <div class="cell large-4 medium-4 small-4">
         Uploaded On: {{ date }}
     </div>
-    <div class="cell large-2 medium-2"></div>
+    <div class="cell large-2 medium-2">
+        Size: {{ fobj.size }}
+    </div>
     <!-- <iframe src="{{ preview_path }}" > -->
 
 </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfobject/2.2.7/pdfobject.min.js" integrity="sha512-g16L6hyoieygYYZrtuzScNFXrrbJo/lj9+1AYsw+0CYYYZ6lx5J3x9Yyzsm+D37/7jMIGh0fDqdvyYkNWbuYuA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>
+    if(document.getElementById("pdf")){
+        PDFObject.embed("{{ preview_path }}", "#pdf");
+    }
+    </script>
 
 
 {% endblock %}

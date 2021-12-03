@@ -48,13 +48,13 @@ class PiStorage(Storage):
   def _open(self, filename, mode='rb'):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((settings.FILE_SERVER_PORT, settings.FILE_SERVER_ADDRESS))
-    s.send("download".encode())
+    s.send('download'.encode())
     if recv_ack(s) == False:
-      raise FileServerError("Server did not successfully respond")
+      raise FileServerError('Server did not successfully respond')
 
     s.send(filename.encode())
     if recv_ack(s) == False:
-      raise FileServerError("Server did not successfully respond")
+      raise FileServerError('Server did not successfully respond')
 
     file_data = ''
     data = s.recv(BUFFER_SIZE)
@@ -69,43 +69,24 @@ class PiStorage(Storage):
 
   def _save(self, name, content):
     full_path = self.path(name)
-    # Create any intermediate directories that do not exist.
-    # directory = os.path.dirname(full_path)
-    # try:
-    #     if self.directory_permissions_mode is not None:
-    #         # Set the umask because os.makedirs() doesn't apply the "mode"
-    #         # argument to intermediate-level directories.
-    #         old_umask = os.umask(0o777 & ~self.directory_permissions_mode)
-    #         try:
-    #             os.makedirs(directory, self.directory_permissions_mode, exist_ok=True)
-    #         finally:
-    #             os.umask(old_umask)
-    #     else:
-    #         os.makedirs(directory, exist_ok=True)
-    # except FileExistsError:
-    #     raise FileExistsError('%s exists and is not a directory.' % directory)
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((settings.FILE_SERVER_ADDRESS, settings.FILE_SERVER_PORT))
-    s.send("upload".encode())
+    s.send('upload'.encode())
     if recv_ack(s) == False:
-      raise FileServerError("Server did not successfully respond")
+      raise FileServerError('Server did not successfully respond')
 
     print(name)
     s.send(name.encode())
     if recv_ack(s) == False:
-      raise FileServerError("Server did not successfully respond")
+      raise FileServerError('Server did not successfully respond')
 
-    # for chunk in content.chunks():
-    #   s.send(chunk)
-    #   if recv_ack(s) == False:
-    #     raise FileServerError("Server did not successfully respond")
     while True:
       bytes_read = content.read(BUFFER_SIZE)
       if not bytes_read:
         break
       s.send(bytes_read)
       if recv_ack(s) == False:
-        raise FileServerError("Server did not successfully respond")
+        raise FileServerError('Server did not successfully respond')
 
     
     s.close()
@@ -124,8 +105,26 @@ class PiStorage(Storage):
 
   def url(self, name):
     if self.base_url is None:
-      raise ValueError("This file is not accessible via a URL")
+      raise ValueError('This file is not accessible via a URL')
     url = filepath_to_uri(name)
     if url is not None:
       url = url.lstrip('/')
     return urljoin(self.base_url, url)
+
+  def size(self, name):
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.connect((settings.FILE_SERVER_ADDRESS, settings.FILE_SERVER_PORT))
+    s.send('size'.encode())
+    if recv_ack(s) == False:
+      raise FileServerError('Server did not successfully respond')
+
+    s.send(name.encode())
+    if recv_ack(s) == False:
+      raise FileServerError('Server did not successfully respond')
+
+    data = s.recv(BUFFER_SIZE)
+    send_ack(s)
+
+    data = int.from_bytes(data, byteorder='big')
+
+    return data

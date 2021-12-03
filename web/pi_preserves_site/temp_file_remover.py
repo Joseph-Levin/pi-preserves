@@ -27,44 +27,32 @@ def main():
 		# iterating over each and every folder and file in the path
 		for root_folder, folders, files in os.walk(path):
 
-			# comparing the minutes
-			if seconds >= get_file_or_folder_age(root_folder):
+			# checking folder from the root_folder
+			for folder in folders:
 
-				# removing the folder
-				remove_folder(root_folder)
-				deleted_folders_count += 1 # incrementing count
+				# folder path
+				folder_path = os.path.join(root_folder, folder)
 
-				# breaking after removing the root_folder
-				break
+				# comparing with the minutes
+				if seconds >= get_file_or_folder_age(folder_path):
 
-			else:
-
-				# checking folder from the root_folder
-				for folder in folders:
-
-					# folder path
-					folder_path = os.path.join(root_folder, folder)
-
-					# comparing with the minutes
-					if seconds >= get_file_or_folder_age(folder_path):
-
-						# invoking the remove_folder function
-						remove_folder(folder_path)
-						deleted_folders_count += 1 # incrementing count
+					# invoking the remove_folder function
+					remove_folder(folder_path)
+					deleted_folders_count += 1 # incrementing count
 
 
-				# checking the current directory files
-				for file in files:
+			# checking the current directory files
+			for file in files:
 
-					# file path
-					file_path = os.path.join(root_folder, file)
+				# file path
+				file_path = os.path.join(root_folder, file)
 
-					# comparing the minutes
-					if seconds >= get_file_or_folder_age(file_path):
+				# comparing the minutes
+				if seconds >= get_file_or_folder_age(file_path):
 
-						# invoking the remove_file function
-						remove_file(file_path)
-						deleted_files_count += 1 # incrementing count
+					# invoking the remove_file function
+					remove_file(file_path)
+					deleted_files_count += 1 # incrementing count
 
 		else:
 
