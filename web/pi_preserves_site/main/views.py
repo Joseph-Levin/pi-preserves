@@ -20,6 +20,13 @@ from .forms import RegistrationForm, FileForm, FolderForm#, CreateNewFile
 from .fileupload import FileUploadToServer, recv_ack, send_ack, BUFFER_SIZE
 from .exceptions import FileServerError
 
+FILE_EXTENSIONS = {
+    'image': ['.apng', '.avif', '.gif', '.jpg', '.jpeg', '.jfif', '.pjpeg', '.pgp', '.png', '.svg', '.webp'],
+    'audio': ['.mp3', '.mpeg', '.wav'],
+    'video': ['.mp4', '.ogg', '.webm'],
+    'pdf': ['.pdf'],
+}
+
 def temp_name_generator(size=4, chars=ascii_uppercase + digits):
     now = datetime.now().strftime('%m-%d-') 
 
@@ -132,7 +139,18 @@ def delete_file(request, id):
 
 
 def view_files(request):
-    return render(request, "main/view_files.html", {})
+    files = File.objects.filter(author=request.user)
+    default_icon = settings.MEDIA_URL + 'default_file.png'
+    music_icon = settings.MEDIA_URL + 'music_icon.png'
+
+    context = {
+        'files': files,
+        'default_icon': default_icon,
+        'music_icon': music_icon,
+        'file_extensions': FILE_EXTENSIONS,
+    }
+
+    return render(request, "main/files_grid.html", context=context)
 
 
 @login_required
@@ -156,58 +174,14 @@ def create_folder(request):
 def view_file(request, id):
     Fobj = File.objects.get(id=id)
     shared_to = Fobj.shared_to
-    extension = Fobj.file.name.rsplit('.')[-1].lower()
-    file_ext = {
-        'image': ['apng', 'avif', 'gif', 'jpg', 'jpeg', 'jfif', 'pjpeg', 'pgp', 'png', 'svg', 'webp'],
-        'audio': ['mp3', 'mpeg', 'wav'],
-        'video': ['mp4', 'ogg', 'webm'],
-        'pdf': ['pdf'],
-    }
 
     date_published = Fobj.uploaded_at.strftime('%B %-d, %Y')
-    temp_path = Path.joinpath(settings.MEDIA_ROOT, 'temp', Fobj.hash + '.' + extension)
-
-    if not Fobj.hash or not exists(temp_path):
-        new_hash = md5()
-        sock = socket(AF_INET, SOCK_STREAM)
-        sock.connect((settings.FILE_SERVER_ADDRESS, settings.FILE_SERVER_PORT))
-        sock.send("download".encode())
-        recv_ack(sock)
-
-
-        filename = File.objects.get(id=id).file.name
-        sock.send(filename.encode())
-        recv_ack(sock)
-
-        file = bytearray()
-        data = sock.recv(BUFFER_SIZE)
-        send_ack(sock)
-        while data:
-            new_hash.update(data)
-            file += data
-            data = sock.recv(BUFFER_SIZE)
-            send_ack(sock)
-        sock.close()
-
-        Fobj.hash = new_hash.hexdigest()
-        Fobj.save()
-        temp_name = new_hash.hexdigest() + '.' + extension
-        f = open(Path.joinpath(settings.MEDIA_ROOT, 'temp', temp_name), mode='wb')
-        f.write(file)
-        f.close()
-        
-        preview_path = settings.MEDIA_URL + 'temp/' + temp_name
-
-    else:
-        preview_path = settings.MEDIA_URL + 'temp/' + Fobj.hash + '.' + extension
     
     default_icon = settings.MEDIA_URL + 'default_file.png'
 
     context = {
         'fobj': Fobj,
-        'preview_path': preview_path,
-        'file_ext': extension,
-        'file_extensions': file_ext,
+        'file_extensions': FILE_EXTENSIONS,
         'date': date_published,
         'default_icon': default_icon,
     }

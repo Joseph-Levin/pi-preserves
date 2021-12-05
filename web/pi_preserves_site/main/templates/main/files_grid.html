@@ -1,13 +1,39 @@
+{% extends "main/base.html" %}
 {% load template_filter %}
 
-<div class="cards-container">
+{% block content %}
+<div class="grid-x grid-margin-x">
+
   {% for file in files %}
-  <div class="card">
-    <div class="card-divider">
+  <div class="cell large-4 medium-6 small-12 card">
+    <div class="grid-y" style="height: 40vh">
+      <div class="cell large-2 medium-2 small-2 card-divider">
         <h5 class="text-center">{{ file.file.name|filenamesplit }}</h5>
-    </div>
-    <div class="card-section">
-      {% if file.file.name}
+      </div>
+      <div class="cell large-8 medium-8 small-8 text-center">
+        {% if file.extension in file_extensions.image %}
+        <a href="/view/{{file.id}}"><img src="{{ file|preview_path_hash }}"></a>
+        {% elif file.extension in file_extensions.audio %}
+        <audio controls src="{{ file|preview_path_hash }}"></audio>
+        {% elif file.extension in file_extensions.video %}
+        <video controls src="{{ file|preview_path_hash }}" style="object-fit: contain;"></video>
+        {% else %}
+        <a href="/view/{{file.id}}"><img src="{{ default_icon }}"></a>
+        {% endif %}
+      </div>
+      <div class="cell large-2 medium-2 small-2 card-section align-self-bottom">
+        <div class="grid-x">
+          <div class="cell large-5 medium-5 small-5">
+            <a class="button expanded" href="/download/{{ file.id }}" download>Download</a>
+          </div>
+          <div class="cell large-2 medium-2 small-2"></div>
+          <div class="cell large-5 medium-5 small-5">
+            <a class="button expanded" href="/view/{{ file.id }}">View</a>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
+{% endfor %}
 </div>
+{% endblock %}

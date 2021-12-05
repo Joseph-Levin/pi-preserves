@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.fields import DateTimeField
 from datetime import datetime
+from os.path import splitext
 
 from .storage import PiStorage
 
@@ -22,9 +23,6 @@ def user_directory_path(instance, filename):
     # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
     return 'user_{0}/{1}/{2}'.format(instance.author.id, datetime.now().strftime('%Y-%m/%d'), filename)
 
-# def unique_dir_path(model, filename):
-#     return 'user/{0}/{1}/{2}'.format(model.creator.id, datetime.now().strftime('%Y-%m-%d--%H-%M-%S'), filename)
-
 
 class File(models.Model):
     description = models.CharField(max_length=255, blank=True)
@@ -37,6 +35,10 @@ class File(models.Model):
     size = models.IntegerField()
     hash = models.CharField(blank=True, max_length=32)
 
+    @property
+    def extension(self):
+        root, ext = splitext(self.file.name)
+        return str(ext.lower())
 
 class Folder(models.Model):
     name = models.CharField(max_length=255)
