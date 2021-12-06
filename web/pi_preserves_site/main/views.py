@@ -1,3 +1,4 @@
+from django.db import reset_queries
 from django.http.response import HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.contrib.auth import logout
@@ -7,6 +8,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from socket import socket, AF_INET, SOCK_STREAM
 from django.conf import settings
+from django.db.models import Q
 
 from pathlib import Path
 from string import ascii_uppercase, digits
@@ -138,8 +140,32 @@ def delete_file(request, id):
     return render(request, "main/view_files.html", {})
 
 
-def view_files(request):
-    files = File.objects.filter(author=request.user)
+def view_files(request, sort_method="newest", filter_method="owned"):
+    # if sort_method == "ascending":
+    #     files = File.objects.filter(author=request.user).order_by('file__name')
+    # elif sort_method == "descending":
+    #     files = File.objects.filter(author=request.user).order_by('-file__name')
+    # elif sort_method == "oldest":
+    Q_obj = Q()
+
+    if filter_method == "shared":
+        Q_obj = Q(shared_to__id=request.user.id)
+
+    elif filter_method == "all_files":
+        Q_obj = Q(public=True) | Q(shared_to__id=request.user.id) | Q(author=request.user)
+
+    elif filter_method == "public":
+        Q_obj = Q(public=True)
+
+    else:
+        Q_obj = Q(author=request.user)
+
+
+    if sort_method == "oldest":
+        files = File.objects.filter(Q_obj).order_by('-uploaded_at')
+    else:
+        files = File.objects.filter(Q_obj).order_by('uploaded_at')
+
     default_icon = settings.MEDIA_URL + 'default_file.png'
     music_icon = settings.MEDIA_URL + 'music_icon.png'
 
@@ -148,9 +174,11 @@ def view_files(request):
         'default_icon': default_icon,
         'music_icon': music_icon,
         'file_extensions': FILE_EXTENSIONS,
+        'sort_method': sort_method,
+        'filter_method': filter_method,
     }
 
-    return render(request, "main/files_grid.html", context=context)
+    return render(request, "main/view_files.html", context=context)
 
 
 @login_required

@@ -5,6 +5,7 @@ from os.path import exists
 from pathlib import Path
 from django.conf import settings
 from socket import socket, AF_INET, SOCK_STREAM
+from math import floor, log, pow
 from ..fileupload import recv_ack, send_ack, BUFFER_SIZE
 
 register = template.Library()
@@ -14,6 +15,16 @@ register = template.Library()
 def filenamesplit(value):
     """Converts a filepath to only the filename"""
     return value.split('/')[-1]
+
+@register.filter
+def convert_bytes(value):
+   if value == 0:
+       return "0B"
+   size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
+   i = int(floor(log(value, 1024)))
+   p = pow(1024, i)
+   s = round(value / p, 2)
+   return "%s %s" % (s, size_name[i])
 
 @register.filter
 def preview_path_hash(fobj):

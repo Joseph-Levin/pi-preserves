@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.fields import DateTimeField
 from datetime import datetime
-from os.path import splitext
+from os.path import basename, splitext
 
 from .storage import PiStorage
 
@@ -39,6 +39,11 @@ class File(models.Model):
     def extension(self):
         root, ext = splitext(self.file.name)
         return str(ext.lower())
+
+    @property
+    def filename(self):
+        return str(basename(self.file.name))
+    
 
 class Folder(models.Model):
     name = models.CharField(max_length=255)

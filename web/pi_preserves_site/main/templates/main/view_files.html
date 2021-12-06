@@ -1,33 +1,38 @@
 {% extends "main/base.html" %}
-{% load template_filter %}
 
-{% block title %}
-View Files
-{% endblock %}
 
 {% block content %}
-<div class="grid-x grid-padding-x">
-    <div class="cell large-12 medium-12 small-12">
-        <div class="cell auto"></div>
-        <div class="cell large-8 medium-8 small-12">
-            <h1 class="text-center">View Files</h1>
-        </div>
-        <div class="cell auto"></div>
-    </div>
+<div class="grid-x">
+    <ul class="dropdown menu" data-dropdown-menu>
+        <li>
+            <a href="#"><h5>Sort</h5></a>
+            <ul class="menu">
+                <li><a id="newest" href="/view_files/newest/{{ filter_method }}/">Newest</a></li>
+                <li><a id="oldest" href="/view_files/oldest/{{ filter_method }}/">Oldest</a></li>
+            </ul>
+        </li>
+    </ul>
+    <ul class="dropdown menu" data-dropdown-menu>
+        <li>
+            <a href="#"><h5>Filter</h5></a>
+            <ul class="menu">
+                <li><a id="owned" href="/view_files/{{ sort_method }}/owned/">Files Owned by Me</a></li>
+                <li><a id="shared" href="/view_files/{{ sort_method }}/shared/">Files Shared with Me</a></li>
+                <li><a id="all_files" href="/view_files/{{ sort_method }}/all_files/">All Files I Have Access To</a></li>
+                <li><a id="public" href="/view_files/{{ sort_method }}/public/">All Public Files</a></li>
+            </ul>
+        </li>
+    </ul>
 
-    <div class="cell large-2 medium-2"></div>
-    <div class="cell large-8 medium-8 small-12">
+</div>
 
-        {% for f in user.file.all %}
-        <div class="card household_card">
-            <div class="card-divider">
-                <a href="/view/{{ f.id }}">{{ f.file.name|filenamesplit }} - {{f.description}}</a>
-            </div>
-            <div class="card-section">
-                <a class="button expanded" href="/download/{{f.id}}" download>Download</a>
-                <a class="button expanded" href="/delete/{{f.id}}">Delete</a>
-            </div>
-        </div>
-        {% endfor %}
-        <div class="cell large-2 medium-2"></div>
-        {% endblock %}
+{% include "main/files_grid.html" %}
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $('#{{filter_method}}').css('font-weight', 'bold');    
+    $('#{{sort_method}}').css('font-weight', 'bold');    
+</script>
+{% endblock %}
