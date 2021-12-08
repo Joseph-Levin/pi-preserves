@@ -51,12 +51,10 @@ void split_path_file(char* filename) {
 
     while(ptr != NULL){
         if (prev) {
-            printf("%s\n", prev);
             char* token = calloc(256, sizeof(char));
             strcpy(token, prev);
             strcat(appended_path, token);
             strcat(appended_path, sep);
-            printf("appended %s\n", appended_path);
             dir = opendir(appended_path);
             // if dir doesn't exist, create it
             if (!dir){
@@ -70,7 +68,6 @@ void split_path_file(char* filename) {
         i++;
     }
     free(appended_path);
-    printf("in split: %s\n", filename);
 }
 
 
@@ -81,10 +78,9 @@ void write_file(int sockfd) {
     char buffer[SIZE+1];
 
     n = recv(sockfd, filename, SIZE, 0);
-    printf("Received filename: %s\n", filename);
 
     split_path_file(filename);
-    printf("filename: %s\n", filename);
+    printf("Receiving: %s\n", filename);
     fp = fopen(filename, "wb");
     if (fp == NULL) {
         perror("Error in creating file");
@@ -117,7 +113,7 @@ void send_file(int sockfd) {
 
     memset(filename, 0, SIZE);
     recv(sockfd, filename, SIZE, 0);
-    printf("Received filename: %s\n", filename);
+    printf("Sending filename: %s\n", filename);
 
     fp = fopen(filename, "r");
     if (fp == NULL) {
@@ -160,7 +156,7 @@ void get_size(int sockfd){
 
     memset(filename, 0, SIZE);
     recv(sockfd, filename, SIZE, 0);
-    printf("Received filename: %s\n", filename);
+    printf("Returning size of: %s\n", filename);
 
     fp = fopen(filename, "r");
     if (fp == NULL) {

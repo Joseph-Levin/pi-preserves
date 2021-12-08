@@ -1,8 +1,12 @@
 {% extends "main/base.html" %}
-{% block title %}{{ title }}{% endblock %}
 {% block content %}
-<h1>{{ title }}</h1>
-<div>
-  {{ body }}
+<div class="grid-x text-center">
+  <div class="cell large-4 medium-4 small-2"></div>
+  <div class="cell large-4 medium-4 small-8">
+    <h1>Pi Preserves</h1>
+  </div>
+  <div class="cell large-4 medium-4 small-2"></div>
 </div>
+
+{% include "main/files_grid.html" %}
 {% endblock %}

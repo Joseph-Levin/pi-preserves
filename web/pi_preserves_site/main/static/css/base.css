@@ -2,6 +2,10 @@
   padding-bottom: 5vh;
 }
 
+body{
+background-color: #f5f6f9;
+}
+
 /* div {
   border: 1px dashed;
 } */
@@ -14,11 +18,16 @@
   -webkit-box-shadow: 0px 5px 20px 0px rgba(0,0,0,0.64);
   -moz-box-shadow: 0px 5px 20px 0px rgba(0,0,0,0.64);
   box-shadow: 0px 5px 20px 0px rgba(0,0,0,0.64);
+  background-color: white;
 }
 
 .card {
   margin-top: 2vh;
   margin-bottom: 1vh;
+  -webkit-box-shadow: 0px 0px 51px -11px rgba(0,0,0,0.65);
+  -moz-box-shadow: 0px 0px 51px -11px rgba(0,0,0,0.65);
+  box-shadow: 0px 0px 51px -11px rgba(0,0,0,0.65);
+  border-style: none;
 }
 
 img {
@@ -37,15 +46,31 @@ audio {
 }
 
 .button {
-  background-color: #005507;
+  background-color: #33b344;
 }
 
 .button:hover {
-  background-color: #003b05;
+  background-color: #2a9538;
+}
+
+.back_button {
+  background-color: #1d9ec5;
+}
+
+.back_button:hover {
+  background-color: #1a8caf;
+}
+
+.card-divider {
+  background-color: #5a91a1;
+  color: white;
+}
+.card-divider:hover {
+  background-color: #518291;
 }
 
 .topbar-responsive {
-  background: #bc060f;
+  background: #c51d4a;
   padding: 1rem 1.5rem;
   -webkit-box-shadow: 0px 5px 24px 0px rgba(0,0,0,0.64);
   -moz-box-shadow: 0px 5px 24px 0px rgba(0,0,0,0.64);
@@ -65,7 +90,7 @@ audio {
 }
 
 .topbar-responsive .menu {
-  background: #bc060f;
+  background: #c51d4a;
 }
 
 .topbar-responsive .menu li:last-of-type {

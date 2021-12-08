@@ -73,6 +73,29 @@ class FileForm(forms.ModelForm):
     def save(self, commit=True):
         file = super(FileForm, self).save(commit=False)
         file.size = file.file.size
+        file.shared_to.add(*self.cleaned_data['shared_to'])
+        if commit:
+            file.save()
+        return file
+
+class EditFileForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+      self.userid = kwargs.pop('userid', None)
+      super(EditFileForm, self).__init__(*args, **kwargs)
+      self.fields['shared_to'].queryset = auth_user.objects.exclude(pk=self.userid)#.exclude(shared_files__id=)
+      self.fields['parent_folder'].queryset = models.Folder.objects.filter(owner=self.userid)
+
+    class Meta:
+      model = models.File
+      fields = ('description', 'author', 'shared_to', 'public', 'parent_folder')
+      widgets = {
+        'author': forms.HiddenInput(),
+      }
+
+    def save(self, commit=True):
+        file = super(EditFileForm, self).save(commit=False)
+        file.size = file.file.size
+        file.shared_to.add(*self.cleaned_data['shared_to'])
         if commit:
             file.save()
         return file

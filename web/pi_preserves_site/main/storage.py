@@ -12,9 +12,10 @@ from django.conf import settings
 from .fileupload import recv_ack, send_ack, BUFFER_SIZE
 from .exceptions import FileServerError
 
+
 class PiStorage(Storage):
   def __init__(self, location=settings.MEDIA_ROOT, base_url=settings.MEDIA_URL,
-    file_permissions_mode=None, directory_permissions_mode=None):
+               file_permissions_mode=None, directory_permissions_mode=None):
     self._location = location
     self._base_url = base_url
     self._file_permissions_mode = file_permissions_mode
@@ -88,20 +89,12 @@ class PiStorage(Storage):
       if recv_ack(s) == False:
         raise FileServerError('Server did not successfully respond')
 
-    
     s.close()
 
     return name
 
-
-
-  
   def path(self, name):
     return safe_join(self.location, name)
-  
-  #TODO make new server action to check if file exists
-  def exists(self, name):
-    return False
 
   def url(self, name):
     if self.base_url is None:

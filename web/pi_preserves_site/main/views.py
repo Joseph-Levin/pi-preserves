@@ -18,7 +18,7 @@ from hashlib import md5
 from os.path import exists
 
 from .models import File, Folder
-from .forms import RegistrationForm, FileForm, FolderForm#, CreateNewFile
+from .forms import RegistrationForm, FileForm, EditFileForm, FolderForm#, CreateNewFile
 from .fileupload import FileUploadToServer, recv_ack, send_ack, BUFFER_SIZE
 from .exceptions import FileServerError
 
@@ -35,9 +35,16 @@ def temp_name_generator(size=4, chars=ascii_uppercase + digits):
     return now + ''.join(choice(chars) for _ in range(size))
 
 def home(request):
+
+    Q_obj = Q(public=True)
+    files = File.objects.filter(Q_obj).order_by('-uploaded_at')
+
+    default_icon = settings.MEDIA_URL + 'default_file.png'
+
     context = {
-        "title": "Pi Preserves",
-        "body": "Pi Preserves is a work in progress",
+        'files': files,
+        'default_icon': default_icon,
+        'file_extensions': FILE_EXTENSIONS,
     }
 
     return render(request, "main/home.html", context=context)
@@ -110,7 +117,7 @@ def upload_files(request):
         form = FileForm(request.POST, request.FILES, userid=request.user.id)
         if form.is_valid():
             form.save(request)
-            return HttpResponseRedirect('/')
+            return redirect('/view_files/')
 
     else:
         form = FileForm(userid=request.user.id)
@@ -137,15 +144,11 @@ def delete_file(request, id):
     
     file.delete()
 
-    return render(request, "main/view_files.html", {})
+    return redirect(view_files)
 
 
+@login_required
 def view_files(request, sort_method="newest", filter_method="owned"):
-    # if sort_method == "ascending":
-    #     files = File.objects.filter(author=request.user).order_by('file__name')
-    # elif sort_method == "descending":
-    #     files = File.objects.filter(author=request.user).order_by('-file__name')
-    # elif sort_method == "oldest":
     Q_obj = Q()
 
     if filter_method == "shared":
@@ -162,9 +165,9 @@ def view_files(request, sort_method="newest", filter_method="owned"):
 
 
     if sort_method == "oldest":
-        files = File.objects.filter(Q_obj).order_by('-uploaded_at')
-    else:
         files = File.objects.filter(Q_obj).order_by('uploaded_at')
+    else:
+        files = File.objects.filter(Q_obj).order_by('-uploaded_at')
 
     default_icon = settings.MEDIA_URL + 'default_file.png'
     music_icon = settings.MEDIA_URL + 'music_icon.png'
@@ -215,3 +218,17 @@ def view_file(request, id):
     }
 
     return render(request, 'main/view_file.html', context=context)
+
+
+def edit_file(request, id):
+    fobj = File.objects.get(pk=id)
+    if request.method == 'POST':
+        form = EditFileForm(request.POST, request.FILES, instance=fobj, userid=request.user.id)
+        if form.is_valid():
+            form.save(request)
+            return redirect('/view/' + str(id))
+    
+    else:
+        form = EditFileForm(instance=fobj, userid=request.user.id)
+
+    return render(request, 'main/edit_file.html', {'form':form})

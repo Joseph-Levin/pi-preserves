@@ -10,54 +10,38 @@
     <div class="cell large-2 medium-2"></div>
     <div class="cell large-8 medium-8 text-center">
         {% if fobj.extension in file_extensions.image %}
-        <img src="{{ fobj|preview_path_hash }}" style="height: 50vh;">
+        <img src="{{ fobj|preview_path_hash }}" style="max-height: 50vh;">
         {% elif fobj.extension in file_extensions.audio %}
         <audio controls src="{{ fobj|preview_path_hash }}"></audio>
         {% elif fobj.extension in file_extensions.video %}
-        <video controls src="{{ fobj|preview_path_hash }}" style="height: 50vh;"></video>
+        <video controls src="{{ fobj|preview_path_hash }}" style="max-height: 50vh;"></video>
         {% elif fobj.extension in file_extensions.pdf %}
         <div id="pdf" style="height: 80vh;"></div>
         {% else %}
-        <img src="{{ default_icon }}" style="height: 15vh;">
+        <img src="{{ default_icon }}" style="max-height: 15vh;">
         {% endif %}
     </div>
     <div class="cell large-2 medium-2"></div>
 </div>
 
 <div class="grid-x" style="margin-top: 2vh;">
-    <div class="cell large-2 medium-2"></div>
-    <div class="cell large-8 medium-8">
-        <div class="cell large-12 medium-12 small-12" style="margin-bottom: 2vh;">
-            <h5>Description:</h5>
-            {{ fobj.description }}
-        </div>
+    <div class="cell large-3 medium-3"></div>
+    <div class="cell large-6 medium-6 callout">
+        <h5><b>Description:</b></h5>
+        <p>{{ fobj.description }}</p>
+        <p><b>Author:</b> {{ fobj.author.username }}</p>
+        <p><b>Uploaded On:</b> {{ date }}</p>
+        <p><b>Size:</b> {{ fobj.size|convert_bytes }}</p>
     </div>
-    <div class="cell large-2 medium-2"></div>
-
-    <div class="cell large-2 medium-2"></div>
-    <div class="cell large-8 medium-8 small-8">
-        Author: {{ fobj.author.username }}
-    </div>
-    <div class="cell large-2 medium-2"></div>
-
-    <div class="cell large-2 medium-2"></div>
-    <div class="cell large-8 medium-8 small-8">
-        Uploaded On: {{ date }}
-    </div>
-    <div class="cell large-2 medium-2"></div>
-
-    <div class="cell large-2 medium-2"></div>
-    <div class="cell large-8 medium-8 small-8">
-        Size: {{ fobj.size|convert_bytes }}
-    </div>
-    <div class="cell large-2 medium-2"></div>
+    <div class="cell large-3 medium-3"></div>
 
 </div>
 
 <div class="grid-x" style="margin-top: 2vh;">
+
     <div class="cell large-1 medium-1 small-1"></div>
     <div class="cell large-4 medium-4 small-4">
-        <a class="button expanded" href="#" onClick="javascript:history.go(-1);">Back</a>
+        <a class="button expanded back_button" href="#" onClick="javascript:history.go(-1);">Back</a>
     </div>
     <div class="cell large-2 medium-2 small-2">
     </div>
@@ -66,6 +50,22 @@
     </div>
     <div class="cell large-1 medium-1 small-1"></div>
 </div>
+    {% if request.user == fobj.author %}
+    <div class="grid-x" style="margin-top: 2vh;">
+        <div class="cell large-1 medium-1 small-1"></div>
+        <div class="cell large-4 medium-4 small-4">
+            <a class="button expanded warning" style="color: white;" href="/edit/{{ fobj.id }}">Edit</a>
+        </div>
+        <div class="cell large-2 medium-2 small-2">
+        </div>
+        <div class="cell large-4 medium-4 small-4">
+            <a class="button alert expanded" href="/delete/{{ fobj.id }}">Delete</a>
+        </div>
+        <div class="cell large-1 medium-1 small-1"></div>
+    </div>
+    {% endif %}
+
+
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfobject/2.2.7/pdfobject.min.js"
     integrity="sha512-g16L6hyoieygYYZrtuzScNFXrrbJo/lj9+1AYsw+0CYYYZ6lx5J3x9Yyzsm+D37/7jMIGh0fDqdvyYkNWbuYuA=="

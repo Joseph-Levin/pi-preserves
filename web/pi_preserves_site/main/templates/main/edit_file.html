@@ -1,25 +1,25 @@
 {% extends 'main/base.html' %}
 {% block title %}
-Upload New File
+Edit File
 {% endblock %}
 
 {% block content %}
-<div class="grid-container large-8 medium-8 small-12" style="padding-top: 2vh;">
+<div class="grid-container large-8 medium-8 small-12">
     <div class="grid-x grid-padding-x">
         <div class="cell large-12 medium-12 small-12">
             <div class="cell auto"></div>
             <div class="cell large-8 medium-8 small-12">
-                <h2 class="text-center"> Upload a File</h2>
+                <h2 class="text-center"> Edit a File</h2>
             </div>
             <div class="cell auto"></div>
         </div>
         <div class="cell large-2 medium-2"></div>
         <div class="cell large-8 medium-8 small-12">
 
-            <form method="post" action="/upload/" enctype='multipart/form-data'>
+            <form method="post">
                 {% csrf_token %}
                 {{ form.as_p }}
-                <input type="submit" class="button expanded" name="Upload" />
+                <input type="submit" class="button expanded" name="Edit" />
             </form>
         </div>
         <div class="cell large-2 medium-2"></div>
